@@ -1,0 +1,212 @@
+
+
+# alias OSXUSER='Oleksandr.Bretsko'
+# alias PROJECTNAME='MyApp'
+
+# export CODECOV_TOKEN="40e8c05b-f154-4475-a9bf-931164142183"
+
+
+
+#XCODE
+
+alias clearDerivedData='rm -Rf ~/Library/Developer/Xcode/DerivedData'
+
+switchXcode() {
+	if [ -n "$1" ]; then
+		sudo xcode-select -switch /Applications/Xcode\ $1.app
+	else 
+		sudo xcode-select -switch /Applications/Xcode.app
+	fi
+}
+
+# pass name of the template
+createStandardTemplateNamed() {
+  mkdir -p ~/Library/Developer/Xcode/Templates/File\ Templates/Source/$1.xctemplate
+  cd ~/Library/Developer/Xcode/Templates/File\ Templates/Source
+
+  cp -r /Applications/Xcode.app/Contents/Developer/Library/Xcode/Templates/File\ Templates/Source/Swift\ File.xctemplate/* $1.xctemplate/
+
+}
+
+# pass name of the template
+createTemplateNamed() {
+  createStandardTemplateNamed $1
+
+  echo "" > $1.xctemplate/___FILEBASENAME___.swift
+}
+
+createEmptyTemplate() {
+  createTemplateNamed "Empty"
+}
+
+alias sqlitebrowser='/Applications/DB\ Browser\ for\ SQLite.app/Contents/MacOS/DB\ Browser\ for\ SQLite'
+alias lldbrc='vi ~/.lldbinit'
+
+
+# Open
+alias openxw='open *.xcworkspace'
+alias openxp='open *.xcodeproj'
+alias openxplay='open ~/Projects/MyTestPlayground.playground'
+
+alias rm_xcodeproj='rmrf *.xcodeproj'
+
+countSwiftLinesIn() {
+  ( find $1 -name '*.swift' -print0 | xargs -0 cat ) | wc -l
+}
+
+countSwiftLinesInVerbouse() {
+  find $1 -name '*.swift' | xargs wc -l
+}
+
+
+alias openxplay='open ~/Projects/MyTestPlayground.playground'
+
+# Backup
+alias backupXcodeUserData='rmrf ~/Xcode_UserData ; mkdir ~/Xcode_UserData ; /bin/cp -rf ~/Library/Developer/Xcode/UserData/* ~/Xcode_UserData'
+alias restoreXcodeUserData='/bin/cp -rf ~/Xcode_UserData/* ~/Library/Developer/Xcode/UserData/'
+
+
+# SWIFT
+
+
+# Swift Package
+
+alias sedit='edit Package.swift'
+
+alias sgen='swift package generate-xcodeproj'
+
+sgenOpenSSL(){
+  swift package -Xswiftc -I/usr/local/opt/openssl/include -Xlinker -L/usr/local/opt/openssl/lib generate-xcodeproj
+}
+
+sgenOpenSSLConfig(){
+    swift package --xcconfig-overrides Resources/Config/base.xcconfig -Xswiftc -I/usr/local/opt/openssl/include -Xlinker -L/usr/local/opt/openssl/lib generate-xcodeproj
+}
+
+sgenConfig(){
+    sgen --xcconfig-overrides Resources/Config/Base.xcconfig
+}
+
+sgenConfigEShell(){
+    sgen --xcconfig-overrides Resources/Config/EShell.xcconfig
+}
+
+sgenConfigBase(){
+    sgen --xcconfig-overrides Resources/Config/Base.xcconfig
+}
+
+sgenConfigPsql(){
+    swift package -Xlinker -L/usr/local/opt/libpq/lib -Xswiftc -I/usr/local/opt/libpq/include generate-xcodeproj 
+    #TODO sgen --xcconfig-overrides Config/psql.xcconfig
+}
+
+sbuildPsql(){
+    swift build -Xcc -I/usr/local/opt/libpq/include -Xlinker -L/usr/local/opt/libpq/lib -Xswiftc -I/usr/local/opt/libpq/include
+    #TODO sgen --xcconfig-overrides Config/psql.xcconfig
+}
+
+alias sinit='swift package init'
+alias sclean='swift package clean'
+alias scleanall='rm -f Package.resolved | rm -rf .build && sclean'
+
+alias sbuild='swift build'
+alias sbuilderr='sbuild | grep -A3 -B3 error'
+alias srebuild='scleanall && swift build'
+
+alias sbuildmysql='sbuild -Xswiftc -DNOJSON'
+
+alias swtest='swift test'
+
+alias swtesterr='swtest | grep "passed\|failed"' #todo if failed returns true grep the same output for more context
+
+sregen(){
+  scleanall
+  sgen
+}
+
+swtesterrContext() {
+  swtestOut=$(swtest)
+  swtestFailed=$( echo "$swtestOut" | grep "failed\|error" )
+
+  if [ $? -eq 0 ]; then
+
+    echo "$swtestOut" | grep -A$1 -B$1 "failed\|error"
+
+  else
+
+    echo "$swtestOut" | grep passed
+
+  fi
+}
+
+#alias sprotoc='protoc --swift_out=. *.proto'
+
+
+# Plugins
+
+alias rmPlugins='rm -Rf ~/Library/Application Support/Developer/Shared/Xcode/Plug-ins/*'
+alias backupPlugins='rename -S .xcplugin .xcplugin.bak $HOME/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins/*.xcplugin'
+alias restorePlugins='rename -S .xcplugin.bak .xcplugin $HOME/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins/*.xcplugin.bak'
+
+alias backupXcodeSettings='\cp -rvf ~/Library/Developer/Xcode/UserData/ ~/Projects/XcodeSettings/'
+alias restoreXcodeSettings='\cp -rvf ~/Projects/XcodeSettings/ ~/Library/Developer/Xcode/UserData/'
+
+# Breakpoints
+
+alias cpBreakpoints1='\cp -vf ~/Projects/{$PROJECTNAME/ios/$PROJECTNAME/$PROJECTNAME.xcworkspace/xcuserdata/$OSXUSER.xcuserdatad/xcdebugger/Breakpoints_v2,Breakpoints/breakpoints1}.xcbkptlist'
+
+alias restoreBreakpoints1='\cp -vf ~/Projects/{Breakpoints/breakpoints1,$PROJECTNAME/ios/$PROJECTNAME/$PROJECTNAME.xcworkspace/xcuserdata/$OSXUSER.xcuserdatad/xcdebugger/Breakpoints_v2}.xcbkptlist'
+
+alias rmBreakpoints='rm -f ~/Projects/$PROJECTNAME/ios/$PROJECTNAME/$PROJECTNAME.xcworkspace/xcuserdata/$OSXUSER.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist'
+
+cpBreakpoints(){
+  \cp -vf ~/Projects/{$PROJECTNAME/ios/$PROJECTNAME/$PROJECTNAME.xcworkspace/xcuserdata/$OSXUSER.xcuserdatad/xcdebugger/Breakpoints_v2,Breakpoints/breakpoints$1}.xcbkptlist
+}
+
+#TODO restore by regex
+restoreBreakpoints(){
+  \cp -vf ~/Projects/{Breakpoints/breakpoints$1,$PROJECTNAME/ios/$PROJECTNAME/$PROJECTNAME.xcworkspace/xcuserdata/$OSXUSER.xcuserdatad/xcdebugger/Breakpoints_v2}.xcbkptlist
+}
+
+
+alias cdCurrentDevice='cd ~/Library/Developer/CoreSimulator/Devices && cdDirLastModified'
+alias openAppDB='cdCurrentDevice && cd data/Containers/Data/Application && cdDirLastModified && if [ -e Documents/$PROJECTNAME.sqlite ]; then sqlitebrowser $(pwd)/Documents/$PROJECTNAME.sqlite &; else echo "Database file not found"; fi'
+
+
+
+# Pods
+# alias podclean='rm -Rf ~/Projects/$PROJECTNAME/ios/$PROJECTNAME/Pods && rm -f ~/Projects/$PROJECTNAME/ios/$PROJECTNAME/Podfile.lock'
+alias podclean='rm -Rf Pods'
+alias podi='pod install'
+alias podu='pod update'
+alias pode='edit Podfile'
+alias pods='open Podfile'
+
+
+#Carthage
+
+alias caru='carthage update --platform iOS'
+alias carb='carthage build --platform iOS'
+
+
+# DB
+
+psql_start(){
+  pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start &
+}
+
+psql_stop(){
+  pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log stop &
+}
+
+
+# Sqlite
+
+
+#Install first DB Browser for SQLite
+alias sqlitebrowser='/Applications/DB\ Browser\ for\ SQLite.app/Contents/MacOS/DB\ Browser\ for\ SQLite'
+
+
+#TODO
+# alias slqiteShowAll= echo 'SELECT * FROM some_table;' | sqlite3 example.db
+

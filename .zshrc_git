@@ -1,0 +1,179 @@
+
+
+alias gitCommits='git log --pretty=format:"%C(yellow)%h %Cred%ad %Cblue%an%Cgreen%d %Creset%s" --date=short'
+alias gitCurrentBranch='git rev-parse --abbrev-ref HEAD'
+alias gitCurrentChangesInDir='git diff --stat --'
+alias gitCurrentChangesNoContext='git diff -U0'
+alias gitDiff1='git diff HEAD\^ HEAD'
+alias gitDiff2='git diff HEAD\^\^ HEAD'
+alias gitDiffFilenames='git diff --name-only'
+alias gitDiffFilenames1='git diff --name-only HEAD\^ HEAD'
+alias gitDiffFilenames2='git diff --name-only HEAD\^\^ HEAD'
+alias gitl10='git log -n10 --oneline'
+alias gitl5='git log -n5 --oneline'
+alias gitLogFile='git log --follow -p --'
+alias gitLogFilepattern='ffhere $1 | xargs -0 gitlogfile'
+alias gitRebase='git rebase develop'
+alias gitReset='git checkout .'
+alias gitResetHard='git reset --hard @{upstream}'
+alias gitReturnToBase='git reset --hard && git checkout develop && git pull'
+alias gits='git status'
+alias gitSave='git stash && git stash apply'
+alias gitsh='git show'
+alias grepGitCommits='git log --pretty=format:"%h%x09%an%x09%ad%x09%s"'
+
+alias GITBranchBase='feature/Project'
+
+
+#----------- Tags 
+
+
+gitRemoveTag(){
+  git push --delete origin $1 
+  git tag --delete $1
+}
+
+gitAddTag(){
+  git tag $1
+  git push --tags 
+}
+
+gitRetagRemote(){
+  gitRemoveTag $1
+  gitAddTag $1
+}
+
+gitRetagLocally(){
+  git tag -d $1
+  git tag $1
+}
+
+
+#-----------
+
+
+gitAmend(){
+  git commit --amend --no-edit 
+}
+
+gitPush(){
+  git push -u origin $(gitCurrentBranch)
+}
+
+gitForcePush(){
+  git push -fu origin $(gitCurrentBranch)
+}
+
+
+# gitPushAmend(){
+#   git add * ; gitAmend && gitForcePush
+# }
+
+
+gitForceUpdateRemote(){
+  git add * 
+  gitAmend
+  gitForcePush
+  gitRetagRemote 1.0.0
+}
+
+
+
+gitUpdateLocal(){
+  git add * 
+  gitAmend
+  gitRetagLocally 1.0.0
+}
+alias gitu=gitUpdateLocal
+
+
+#-------------------
+
+
+gitCloneBranch(){
+ git clone -b $1 --single-branch $2
+}
+
+
+
+#-----------
+
+gitMergeNCommits(){
+  git reset --soft HEAD~$1
+  git commit --amend
+}
+
+gitMerge2Commits(){
+  git reset --soft "HEAD^"
+  git commit --amend
+}
+
+
+#-------------
+
+
+gitStashPush(){
+ git stash save
+}
+
+gitStashPop(){
+ git stash apply stash@{0}
+}
+
+gitStashShow(){
+git stash show -p stash@{$1}
+}
+
+gitStashShowLast(){
+gitStashShow 0
+}
+
+
+gitStashUnstaged(){
+  git stash --keep-index
+}
+
+gitStashSave(){
+  git stash save "$1"
+}
+
+#use regex for stash apply
+gitStashApplyRegex(){
+  git stash apply stash^{/$*}
+}
+
+gitStashShow(){
+  git stash show stash^{/$*} -p;
+}
+
+
+#-----------
+
+
+gitStashAndRebase(){
+ currentBranch=$(gitCurrentBranch)
+#  $(git rev-parse --abbrev-ref HEAD)
+ git stash save $1
+ git checkout develop
+ git pull
+ git checkout currentBranch
+ git rebase develop
+ git stash apply stash@{0}
+}
+
+
+gitdiffn(){
+ git diff HEAD\~$1 HEAD
+}
+
+gitUndoCommits(){
+ git reset HEAD\^
+}
+
+gitCommit() {
+ git commit -m $1
+}
+
+gitlsBranchByDate(){
+ git for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(color:red)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:green)%(committerdate:relative)%(color:reset))'
+}

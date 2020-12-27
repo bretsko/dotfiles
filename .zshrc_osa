@@ -1,0 +1,13 @@
+
+
+osahome=~/.osascript
+
+
+# fire_newWindow(){
+# 	$osahome/firefox_new_window.scpt	
+# }
+
+# fire_newTab(){
+# 	$osahome/firefox_new_tab.scpt	
+# }
+
