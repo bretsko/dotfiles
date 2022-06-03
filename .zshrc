@@ -46,6 +46,8 @@ set -o vi
 
 alias vi='vim'
 
+alias subl='/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl'
+
 alias edit='subl'
 alias EDITOR=subl
 alias HOMEBREW_EDITOR=subl
